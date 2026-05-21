@@ -17,6 +17,7 @@ Mở `http://localhost:3000`.
 npm run dev      # chạy local development server
 npm run lint     # kiểm tra lint
 npm run build    # build production
+npm run test:e2e # chạy Playwright end-to-end tests
 ```
 
 Có thể dùng script tương ứng:
@@ -25,6 +26,15 @@ Có thể dùng script tương ứng:
 ./scripts/dev.sh
 ./scripts/lint.sh
 ./scripts/build.sh
+```
+
+## E2E Tests
+
+Playwright tests live in `tests/e2e/`. The test runner starts the Next.js dev server automatically.
+
+```bash
+npm run test:e2e
+npm run test:e2e:ui
 ```
 
 ## Project Structure
