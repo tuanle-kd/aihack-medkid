@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
+import { messagesApi } from '@/lib/api';
 import { ageLabel, formatTime, cn } from '@/lib/utils';
-import type { MedCase } from '@/types';
+import type { MedCase, ChatMessage } from '@/types';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,22 @@ export function CaseDetail() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showDiff, setShowDiff] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // Fetch messages from API when a case is selected
+  useEffect(() => {
+    if (!selectedCaseId) { setMessages([]); return; }
+    messagesApi.list(selectedCaseId).then((rows) => {
+      setMessages(rows.map((r) => ({
+        id: r.id,
+        session_id: r.case_id,
+        sender: r.sender as ChatMessage['sender'],
+        content: r.raw_text,
+        timestamp: r.created_at,
+        is_approved: r.is_approved,
+      })));
+    }).catch(console.error);
+  }, [selectedCaseId]);
 
   if (!medCase) {
     return (
@@ -54,8 +71,8 @@ export function CaseDetail() {
   }
 
   // Initialize draft when case changes
-  if (draft === '' && medCase.ai_draft) {
-    setDraft(medCase.ai_draft);
+  if (draft === '' && medCase) {
+    setDraft(medCase.ai_draft ?? 'Bác sĩ đã xem xét và duyệt ca tư vấn này.');
   }
 
   const handleResetDraft = () => {
@@ -125,7 +142,7 @@ export function CaseDetail() {
 
           {/* Messages tab */}
           <TabsContent value="messages" className="p-6 m-0 space-y-4">
-            <MessagesTabContent medCase={medCase} />
+            <MessagesTabContent medCase={medCase} messages={messages} />
           </TabsContent>
         </div>
       </Tabs>
@@ -514,10 +531,14 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
 
 // ─── Input Messages Tab Content Component ─────────────────────────────────────
 
-function MessagesTabContent({ medCase }: { medCase: MedCase }) {
+function MessagesTabContent({ medCase, messages }: { medCase: MedCase; messages: ChatMessage[] }) {
+  const displayMessages = messages.length > 0 ? messages : medCase.messages;
   return (
     <div className="space-y-4">
-      {medCase.messages.map((msg) => (
+      {displayMessages.length === 0 && (
+        <p className="text-xs text-slate-400 text-center py-8">Chưa có tin nhắn nào.</p>
+      )}
+      {displayMessages.map((msg) => (
         <div key={msg.id} className="bg-teal-50/10 border border-teal-200/30 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
             <span className="text-xs font-bold text-teal-800 flex items-center gap-1">

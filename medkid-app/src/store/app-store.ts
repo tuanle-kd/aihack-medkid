@@ -170,14 +170,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         return;
       }
 
-      // Create case in Supabase
-      const sbCase = await casesApi.create({
-        anxiety_level: result.anxietyLevel,
-        workflow_type: result.workflowType === 'IgG_Food_Sensitivity' ? 'igg'
-          : result.workflowType === 'Respiratory' ? 'respiratory'
-          : result.workflowType === 'Skin_Lesion' ? 'skin'
-          : 'general',
-      });
+      // Reuse existing pending case for this session, or create a new one
+      const { cases } = get();
+      const existingCase = cases.find((c) => c.session_id === sessionId && c.status === 'pending');
+
+      let sbCase: CaseApiRow;
+      if (existingCase) {
+        sbCase = { id: existingCase.id } as CaseApiRow;
+      } else {
+        sbCase = await casesApi.create({
+          anxiety_level: result.anxietyLevel,
+          workflow_type: result.workflowType === 'IgG_Food_Sensitivity' ? 'igg'
+            : result.workflowType === 'Respiratory' ? 'respiratory'
+            : result.workflowType === 'Skin_Lesion' ? 'skin'
+            : 'general',
+        });
+      }
 
       // Persist parent message
       await messagesApi.send({
@@ -189,19 +197,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       });
 
       auditApi.log('MESSAGE_SENT', sessionId, { case_id: sbCase.id });
-      auditApi.log('DRAFT_GENERATED', sessionId, { case_id: sbCase.id });
-
-      // Build local MedCase from pipeline result for immediate UI update
-      const newCase = createNewCase(
-        sessionId,
-        result,
-        text,
-        'Bệnh nhi',
-        36,
-        images
-      );
-      // Overwrite id with real Supabase id so approve/reject use correct id
-      newCase.id = sbCase.id;
 
       const processingMsg: ChatMessage = {
         id: `msg-${uuidv4().slice(0, 8)}`,
@@ -211,12 +206,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         timestamp: new Date().toISOString(),
       };
 
-      set((s) => ({
-        cases: [newCase, ...s.cases],
-        chatMessages: [...get().chatMessages, processingMsg],
-        isProcessing: false,
-        debugLogs: getDebugLogs(),
-      }));
+      set((s) => {
+        const caseExists = s.cases.some((c) => c.id === sbCase.id);
+        const newCase = createNewCase(sessionId, result, text, 'Bệnh nhi', 36, images);
+        newCase.id = sbCase.id;
+        return {
+          cases: caseExists ? s.cases : [newCase, ...s.cases],
+          chatMessages: [...s.chatMessages, processingMsg],
+          isProcessing: false,
+          debugLogs: getDebugLogs(),
+        };
+      });
     } catch (e) {
       console.error('[sendMessage]', e);
       set({ isProcessing: false, debugLogs: getDebugLogs() });
@@ -227,13 +227,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   approveCase: async (caseId, finalDraft) => {
     const { sessionId } = get();
+    const draftText = finalDraft?.trim() || 'Bác sĩ đã xem xét và duyệt ca tư vấn này.';
 
     await casesApi.updateStatus(caseId, 'approved');
-    await draftsApi.create({ case_id: caseId, doctor_edited: finalDraft });
+    await draftsApi.create({ case_id: caseId, doctor_edited: draftText });
     await messagesApi.send({
       case_id: caseId,
       sender: 'doctor',
-      raw_text: finalDraft,
+      raw_text: draftText,
       is_approved: true,
       disclaimer_version: 'v1',
     });
@@ -245,7 +246,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       id: `msg-${uuidv4().slice(0, 8)}`,
       session_id: get().sessionId ?? '',
       sender: 'doctor',
-      content: finalDraft,
+      content: draftText,
       timestamp: new Date().toISOString(),
       is_approved: true,
       disclaimer,

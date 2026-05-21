@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { formatRelativeTime, ageLabel } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,11 @@ export function CaseQueue() {
   const cases = useAppStore((s) => s.cases);
   const selectedCaseId = useAppStore((s) => s.selectedCaseId);
   const selectCase = useAppStore((s) => s.selectCase);
+  const loadCases = useAppStore((s) => s.loadCases);
+
+  useEffect(() => {
+    loadCases();
+  }, [loadCases]);
 
   const pendingCases = cases.filter((c) => c.status === 'pending');
   const approvedCases = cases.filter((c) => c.status !== 'pending');
