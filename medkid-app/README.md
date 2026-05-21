@@ -45,6 +45,7 @@ tests/               Test tự động khi bổ sung
 docs/requirements.md            Yêu cầu sản phẩm
 docs/architecture.md            Kiến trúc hệ thống
 docs/ai-document-init-guide.md   Hướng dẫn init/cập nhật tài liệu cho AI
+docs/user-stories-acceptance-criteria.md  User Stories và Acceptance Criteria
 docs/plans/                     Kế hoạch triển khai feature
 docs/decisions/                 Quyết định kỹ thuật/ADR
 scripts/             Script phát triển lặp lại
