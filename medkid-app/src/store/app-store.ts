@@ -8,6 +8,7 @@ import {
   draftsApi,
   consentsApi,
   auditApi,
+  authApi,
   setAccessToken,
   type CaseApiRow,
 } from '@/lib/api';
@@ -108,9 +109,21 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   grantConsent: async () => {
     const sessionId = uuidv4();
+
+    // Auto sign-in với dev OTP — không cần màn hình nhập SĐT
+    try {
+      const DEV_PHONE = process.env.NEXT_PUBLIC_DEV_PHONE ?? '+84900000000';
+      const DEV_OTP = '294296';
+      const auth = await authApi.verify(DEV_PHONE, DEV_OTP);
+      setAccessToken(auth.access_token);
+      set({ accessToken: auth.access_token });
+    } catch (e) {
+      console.warn('[grantConsent] auto sign-in failed, proceeding without token:', e);
+    }
+
     set({ sessionId, isConsented: true });
 
-    // Persist to Supabase (non-blocking — UI is already unlocked)
+    // Persist consent + audit (non-blocking)
     consentsApi.grant(sessionId).catch(console.error);
     auditApi.log('CONSENT_GRANTED', sessionId);
     auditApi.log('SESSION_START', sessionId);
