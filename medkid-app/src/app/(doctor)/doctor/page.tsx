@@ -9,8 +9,8 @@ export default function DoctorPage() {
       title="MediKid-AI Doctor"
       subtitle="Hàng đợi ca, hồ sơ VCLINIC và duyệt phản hồi trước khi gửi phụ huynh"
     >
-      <section className="flex min-w-0 flex-1 bg-white">
-        <aside className="w-80 shrink-0 overflow-y-auto border-r border-slate-200">
+      <section className="flex min-w-0 flex-1 flex-col bg-white lg:flex-row">
+        <aside className="h-80 shrink-0 overflow-y-auto border-b border-slate-200 lg:h-auto lg:w-[22rem] lg:border-r lg:border-b-0">
           <CaseQueue />
         </aside>
         <div className="min-w-0 flex-1 overflow-hidden">

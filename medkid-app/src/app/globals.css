@@ -57,11 +57,17 @@
   --font-mono: var(--font-geist-mono);
   
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
   --animate-fade-in-up: fadeInUp 0.4s ease-out;
   --animate-fade-in: fadeIn 0.2s ease-out;
   --animate-fade-out: fadeOut 0.15s ease-in;
   --animate-slide-in-bottom: slideInBottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-slide-out-bottom: slideOutBottom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
 }
 
 @keyframes fadeInUp {
@@ -96,10 +102,46 @@
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: hsl(var(--background));
+  text-size-adjust: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -8,23 +8,26 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FileText, 
-  MessageSquare, 
-  CornerUpLeft, 
-  Check, 
-  X, 
-  Sparkles, 
-  Microscope, 
-  Heart, 
-  Calendar, 
-  Weight, 
-  Dna, 
-  History, 
+import {
+  FileText,
+  MessageSquare,
+  CornerUpLeft,
+  Check,
+  X,
+  Sparkles,
+  Microscope,
+  Heart,
+  Calendar,
+  Weight,
+  Dna,
+  History,
   CheckCircle,
   AlertTriangle,
+  BookOpen,
   Camera
 } from 'lucide-react';
+import { TipTapEditor } from '@/components/ui/tiptap-editor';
+import { CVImageOverlay } from '@/components/doctor/cv-image-overlay';
 
 export function CaseDetail() {
   const selectedCaseId = useAppStore((s) => s.selectedCaseId);
@@ -34,10 +37,10 @@ export function CaseDetail() {
   const rejectCase = useAppStore((s) => s.rejectCase);
 
   const medCase = cases.find((c) => c.id === selectedCaseId);
-  const [draft, setDraft] = useState('');
+  const [draftState, setDraftState] = useState({ caseId: '', value: '' });
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
-  const [showDiff, setShowDiff] = useState(false);
+  const [showDiffState, setShowDiffState] = useState({ caseId: '', value: false });
 
   if (!medCase) {
     return (
@@ -53,51 +56,52 @@ export function CaseDetail() {
     );
   }
 
-  // Initialize draft when case changes
-  if (draft === '' && medCase.ai_draft) {
-    setDraft(medCase.ai_draft);
-  }
-
   const handleResetDraft = () => {
-    setDraft(medCase.ai_draft ?? '');
+    setDraftState({ caseId: medCase.id, value: medCase.ai_draft ?? '' });
   };
 
+  const draft = draftState.caseId === medCase.id ? draftState.value : medCase.ai_draft ?? '';
+  const showDiff = showDiffState.caseId === medCase.id ? showDiffState.value : false;
+  const setDraft = (value: string) => setDraftState({ caseId: medCase.id, value });
+  const setShowDiff = (value: boolean) => setShowDiffState({ caseId: medCase.id, value });
+
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex h-full min-h-0 flex-col bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-250 bg-white flex-shrink-0">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-slate-800 text-base">{medCase.patient_name}</h3>
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <h3 className="text-base font-bold text-slate-800">{medCase.patient_name}</h3>
             <Badge variant="outline" className="text-[10px] font-black uppercase text-teal-700 border-teal-200 bg-teal-50">
               {medCase.workflow_type.replace(/_/g, ' ')}
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">
+          <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
             Tuổi: {ageLabel(medCase.patient_age_months)} · Mã số: {medCase.id.slice(0, 8).toUpperCase()}
           </p>
         </div>
         <button
           onClick={() => selectCase(null)}
-          className="text-slate-400 hover:text-red-500 text-lg w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-500"
+          aria-label="Đóng chi tiết ca"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
 
       {/* Tabs Container */}
-      <Tabs defaultValue="draft" className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-6 border-b border-slate-200 bg-white flex-shrink-0">
-          <TabsList className="w-full justify-start gap-1 bg-slate-50 p-1">
-            <TabsTrigger value="draft" className="flex-1 sm:flex-initial gap-1.5 py-2">
+      <Tabs defaultValue="draft" className="flex flex-1 flex-col overflow-hidden">
+        <div className="shrink-0 overflow-x-auto border-b border-slate-200 bg-white px-4 sm:px-6">
+          <TabsList className="w-max min-w-full justify-start gap-1 bg-slate-50 p-1">
+            <TabsTrigger value="draft" className="flex-1 gap-1.5 py-2 sm:flex-initial">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               Bản Nháp AI
             </TabsTrigger>
-            <TabsTrigger value="patient" className="flex-1 sm:flex-initial gap-1.5 py-2">
+            <TabsTrigger value="patient" className="flex-1 gap-1.5 py-2 sm:flex-initial">
               <FileText className="h-3.5 w-3.5 text-teal-600" />
               Hồ Sơ VCLINIC
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex-1 sm:flex-initial gap-1.5 py-2">
+            <TabsTrigger value="messages" className="flex-1 gap-1.5 py-2 sm:flex-initial">
               <MessageSquare className="h-3.5 w-3.5 text-teal-600" />
               Triệu Chứng Đầu Vào
             </TabsTrigger>
@@ -107,7 +111,7 @@ export function CaseDetail() {
         {/* Tab content area */}
         <div className="flex-1 overflow-y-auto">
           {/* Draft tab */}
-          <TabsContent value="draft" className="p-6 m-0 space-y-4">
+          <TabsContent value="draft" className="m-0 space-y-4 p-4 sm:p-6">
             <DraftTabContent
               medCase={medCase}
               draft={draft}
@@ -119,12 +123,12 @@ export function CaseDetail() {
           </TabsContent>
 
           {/* Patient tab */}
-          <TabsContent value="patient" className="p-6 m-0 space-y-4">
+          <TabsContent value="patient" className="m-0 space-y-4 p-4 sm:p-6">
             <PatientTabContent medCase={medCase} />
           </TabsContent>
 
           {/* Messages tab */}
-          <TabsContent value="messages" className="p-6 m-0 space-y-4">
+          <TabsContent value="messages" className="m-0 space-y-4 p-4 sm:p-6">
             <MessagesTabContent medCase={medCase} />
           </TabsContent>
         </div>
@@ -132,30 +136,30 @@ export function CaseDetail() {
 
       {/* Action buttons */}
       {medCase.status === 'pending' && (
-        <div className="flex gap-3 p-4 border-t border-slate-200 bg-white flex-shrink-0">
+        <div className="flex shrink-0 flex-col gap-2 border-t border-slate-200 bg-white p-4 sm:flex-row sm:gap-3">
           <Button
             onClick={() => setShowRejectModal(true)}
             variant="outline"
-            className="flex-1 font-bold text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+            className="flex-1 border-red-200 font-bold text-red-600 hover:border-red-300 hover:bg-red-50"
           >
             <X className="h-4 w-4 mr-1.5 text-red-500" />
-            TỪ CHỐI DUYỆT CA
+            Từ chối duyệt ca
           </Button>
           <Button
             onClick={() => approveCase(medCase.id, draft)}
             variant="default"
-            className="flex-[2] font-black tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-700/10"
+            className="flex-[2] bg-emerald-600 font-black tracking-wide text-white shadow-lg shadow-emerald-700/10 hover:bg-emerald-700"
           >
             <Check className="h-4 w-4 mr-1.5 text-white" />
-            KÝ DUYỆT & GỬI PHỤ HUYNH
+            Ký duyệt & gửi phụ huynh
           </Button>
         </div>
       )}
 
       {/* Reject modal overlay */}
       {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs animate-fade-in-up">
-          <div className="w-full max-w-sm mx-4 bg-white rounded-3xl p-6 shadow-2xl border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl">
             <div className="flex items-center gap-2 mb-3 text-red-600">
               <AlertTriangle className="h-5 w-5 text-red-500" />
               <h4 className="font-bold text-slate-800 text-sm sm:text-base">Lý Do Từ Chối Duyệt Ca</h4>
@@ -166,11 +170,11 @@ export function CaseDetail() {
             </p>
 
             <select
-              className="w-full border border-slate-250 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium mb-4 bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-teal-600 transition-all"
+              className="mb-4 min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base font-medium transition-all focus:outline-hidden focus:ring-2 focus:ring-teal-600 sm:text-sm"
               onChange={(e) => setRejectReason(e.target.value)}
               defaultValue=""
             >
-              <option value="" disabled>-- Chọn lý do lâm sàng --</option>
+              <option value="" disabled>Chọn lý do lâm sàng</option>
               <option value="Thông tin triệu chứng không đủ để sàng lọc">Triệu chứng khai báo quá mập mờ</option>
               <option value="Hình ảnh tổn thương da mờ hoặc không đủ ánh sáng">Ảnh chụp tổn thương mờ/thiếu sáng</option>
               <option value="Triệu chứng cần chỉ định khám lâm sàng trực tiếp ngay">Bắt buộc khám lâm sàng trực tiếp</option>
@@ -230,8 +234,8 @@ function DraftTabContent({
   return (
     <div className="space-y-4">
       {/* Editor toolbar */}
-      <div className="flex items-center justify-between bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-200/50">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/50 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{wordCount} từ soạn thảo</span>
           {diff !== 0 && (
             <span className={cn(
@@ -242,16 +246,16 @@ function DraftTabContent({
             </span>
           )}
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setShowDiff(!showDiff)}
-            className="text-xs font-bold text-teal-700 hover:underline flex items-center gap-1 cursor-pointer"
+            className="flex min-h-9 cursor-pointer items-center gap-1 rounded-lg text-xs font-bold text-teal-700 hover:underline"
           >
-            {showDiff ? '✏️ Hiện ô sửa đổi' : '🔍 Xem Diff chi tiết'}
+            {showDiff ? 'Hiện ô sửa đổi' : 'Xem diff chi tiết'}
           </button>
           <button
             onClick={onReset}
-            className="text-xs font-bold text-slate-400 hover:text-slate-600 hover:underline flex items-center gap-1 cursor-pointer"
+            className="flex min-h-9 cursor-pointer items-center gap-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700 hover:underline"
           >
             <CornerUpLeft className="h-3 w-3" />
             Khôi phục gốc
@@ -263,25 +267,17 @@ function DraftTabContent({
       {showDiff ? (
         <DiffView original={original} edited={draft} />
       ) : (
-        <div className="relative">
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            disabled={medCase.status !== 'pending'}
-            className="w-full h-80 border border-teal-200/60 bg-teal-50/10 rounded-2xl px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:bg-white focus:border-transparent transition-all leading-relaxed font-mono font-medium text-slate-800"
-            placeholder="Viết hoặc hiệu chỉnh đơn thuốc/hướng dẫn chăm sóc lâm sàng..."
-          />
-          {medCase.status === 'pending' && (
-            <span className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-400 bg-white/80 px-2 py-0.5 rounded-md border border-slate-200/40">
-              Bác sĩ soạn thảo tự do
-            </span>
-          )}
-        </div>
+        <TipTapEditor
+          value={draft}
+          onChange={setDraft}
+          disabled={medCase.status !== 'pending'}
+          placeholder="Viết hoặc hiệu chỉnh đơn thuốc/hướng dẫn chăm sóc lâm sàng..."
+        />
       )}
 
       {/* CV skin analysis banner */}
       {medCase.cv_analysis && (
-        <div className="border border-teal-100 bg-teal-50/20 rounded-2xl p-4 flex gap-3.5 items-start">
+        <div className="flex flex-col gap-3.5 rounded-2xl border border-teal-100 bg-teal-50/20 p-4 sm:flex-row sm:items-start">
           <div className="bg-teal-100 p-2 rounded-xl text-teal-700">
             <Microscope className="h-5 w-5 text-teal-600" />
           </div>
@@ -289,7 +285,7 @@ function DraftTabContent({
             <h4 className="text-xs font-bold text-teal-950 uppercase tracking-wider mb-1.5 flex items-center gap-1">
               Phân Tích Bounding-box Thị Giác Máy Tính (CV Analysis)
             </h4>
-            <div className="grid grid-cols-3 gap-3 text-xs text-slate-600">
+            <div className="grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
               <div className="bg-white p-2 rounded-xl border border-slate-100">
                 <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Diện tích</span>
                 <strong className="text-slate-800 text-sm mt-0.5 block">{medCase.cv_analysis.area_cm2} cm²</strong>
@@ -313,7 +309,8 @@ function DraftTabContent({
           <AccordionItem value="rag-sources" className="border border-slate-200/65 rounded-2xl bg-slate-50/20 overflow-hidden px-4">
             <AccordionTrigger className="hover:no-underline font-bold text-slate-700 text-xs py-3.5">
               <span className="flex items-center gap-2">
-                📚 Tài liệu RAG đối chiếu chéo ({medCase.rag_snippets.length})
+                <BookOpen className="h-4 w-4 text-teal-600" />
+                Tài liệu RAG đối chiếu chéo ({medCase.rag_snippets.length})
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-3">
@@ -348,7 +345,7 @@ function DiffView({ original, edited }: { original: string; edited: string }) {
 
   return (
     <div className="border border-slate-200 rounded-2xl p-4 text-xs sm:text-sm leading-relaxed bg-slate-50/30">
-      <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 mb-3 bg-white p-2 rounded-xl border border-slate-150/40 w-fit">
+      <div className="mb-3 flex w-fit max-w-full flex-wrap items-center gap-3 rounded-xl border border-slate-200/40 bg-white p-2 text-[10px] font-bold text-slate-500">
         <span className="flex items-center gap-1">
           <span className="w-2.5 h-2.5 bg-red-100 border border-red-300 line-through rounded-xs inline-block" />
           Màu đỏ = Câu gốc AI
@@ -372,7 +369,7 @@ function DiffView({ original, edited }: { original: string; edited: string }) {
         {editWords
           .filter((w) => !origWords.includes(w))
           .map((w, i) => (
-            <span key={`add-${i}`} className="underline bg-emerald-50 text-emerald-700 px-1 rounded-sm border border-emerald-250/30 font-bold mx-0.5">
+            <span key={`add-${i}`} className="underline bg-emerald-50 text-emerald-700 px-1 rounded-sm border border-emerald-200/30 font-bold mx-0.5">
               {w}{' '}
             </span>
           ))}
@@ -388,8 +385,8 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
   if (!emr) {
     return (
       <div className="p-8 text-center text-slate-400 text-xs">
-        <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 text-lg mb-3 mx-auto border border-slate-200/50">
-          ⚠️
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200/50 bg-slate-50 text-slate-400">
+          <AlertTriangle className="h-5 w-5" />
         </div>
         <p className="font-bold text-slate-600">Đồng bộ EMR VCLINIC thất bại</p>
         <p className="text-slate-400 mt-0.5">Không tìm thấy mã SID y khoa của trẻ em trên hồ sơ liên thông.</p>
@@ -400,7 +397,7 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
   return (
     <div className="space-y-4">
       {/* Basic EMR cards grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-3 flex items-start gap-2.5">
           <Dna className="h-4 w-4 text-teal-600 mt-0.5 flex-shrink-0" />
           <div>
@@ -435,7 +432,7 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
       </div>
 
       {/* History and active drugs */}
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="bg-white border border-slate-200/50 rounded-2xl p-4">
           <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
             <History className="h-3.5 w-3.5 text-teal-600" />
@@ -477,10 +474,10 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
             <Microscope className="h-3.5 w-3.5 text-teal-600" />
             Chỉ số xét nghiệm IgG bán định lượng dị nguyên
           </h4>
-          <div className="overflow-hidden border border-slate-100 rounded-xl">
-            <table className="w-full text-xs">
+          <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <table className="w-full min-w-[520px] text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-150/40 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200/40 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
                   <th className="text-left px-4 py-2.5">Dị nguyên sữa & thực phẩm</th>
                   <th className="text-right px-4 py-2.5">Nồng độ IgG (U/mL)</th>
                   <th className="text-right px-4 py-2.5">Cấp độ lo ngại</th>
@@ -519,9 +516,9 @@ function MessagesTabContent({ medCase }: { medCase: MedCase }) {
     <div className="space-y-4">
       {medCase.messages.map((msg) => (
         <div key={msg.id} className="bg-teal-50/10 border border-teal-200/30 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+          <div className="mb-2.5 flex items-center justify-between gap-3 border-b border-slate-100 pb-2">
             <span className="text-xs font-bold text-teal-800 flex items-center gap-1">
-              <span className="text-sm">👩‍👦</span>
+              <MessageSquare className="h-3.5 w-3.5 text-teal-600" />
               Phụ Huynh Khai Triệu Chứng
             </span>
             <span className="text-[10px] font-bold text-slate-400">{formatTime(msg.timestamp)}</span>
@@ -535,6 +532,11 @@ function MessagesTabContent({ medCase }: { medCase: MedCase }) {
           <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-semibold whitespace-pre-wrap">{msg.content}</p>
         </div>
       ))}
+
+      {/* CV bounding box overlay — shown when case has images + CV data */}
+      {medCase.has_images && medCase.cv_analysis && (
+        <CVImageOverlay cv={medCase.cv_analysis} />
+      )}
     </div>
   );
 }

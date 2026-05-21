@@ -10,6 +10,7 @@ interface AppState {
   // Session
   sessionId: string | null;
   isConsented: boolean;
+  isOnboarded: boolean;
 
   // UI mode
   isEmergency: boolean;
@@ -29,6 +30,9 @@ interface AppState {
 
   // Actions
   grantConsent: () => void;
+  completeOnboarding: () => void;
+  logout: () => void;
+  logDataRightsEvent: (event: 'CONSENT_WITHDRAWN' | 'DATA_DELETION_REQUESTED' | 'DATA_EXPORT_REQUESTED') => void;
   sendMessage: (text: string, images?: string[]) => Promise<void>;
   selectCase: (id: string | null) => void;
   approveCase: (caseId: string, finalDraft: string) => void;
@@ -43,6 +47,7 @@ interface AppState {
 export const useAppStore = create<AppState>((set, get) => ({
   sessionId: null,
   isConsented: false,
+  isOnboarded: false,
   isEmergency: false,
   emergencyKeywords: [],
   isProcessing: false,
@@ -61,6 +66,32 @@ export const useAppStore = create<AppState>((set, get) => ({
       sessionId,
       isConsented: true,
       cases: db.cases.list(),
+    });
+  },
+
+  completeOnboarding: () => set({ isOnboarded: true }),
+
+  logDataRightsEvent: (event) => {
+    const { sessionId } = get();
+    db.debug.log('system', `[DATA_RIGHTS] event=${event} session=${sessionId ?? 'demo'}`);
+    set({ debugLogs: db.debug.list() });
+  },
+
+  logout: () => {
+    const { sessionId } = get();
+    if (sessionId) {
+      db.audit.log('SESSION_EXPIRED', sessionId);
+      db.debug.log('system', `[LOGOUT] session=${sessionId}`);
+    }
+    set({
+      sessionId: null,
+      isConsented: false,
+      isOnboarded: false,
+      isEmergency: false,
+      emergencyKeywords: [],
+      chatMessages: [],
+      selectedCaseId: null,
+      showDebugConsole: false,
     });
   },
 

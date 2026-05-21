@@ -18,7 +18,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
 
-    const baseStyles = 'inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium transition-all duration-250 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer';
+    const baseStyles = 'inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer';
 
     const variants = {
       default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/95 hover:shadow-md hover:-translate-y-[1px]',
@@ -30,10 +30,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
-      default: 'h-10 px-4 py-2',
-      sm: 'h-8 rounded-xl px-3 text-xs',
-      lg: 'h-12 rounded-3xl px-8 text-base',
-      icon: 'h-10 w-10',
+      default: 'min-h-11 px-4 py-2',
+      sm: 'min-h-10 rounded-lg px-3 text-xs',
+      lg: 'min-h-12 rounded-xl px-8 text-base',
+      icon: 'h-11 w-11',
     };
 
     return (

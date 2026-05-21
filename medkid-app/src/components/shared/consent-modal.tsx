@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileText, ShieldAlert, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, ShieldAlert, ChevronDown, ChevronUp, Stethoscope } from 'lucide-react';
 
 export function ConsentModal() {
   const [checked, setChecked] = useState(false);
@@ -14,15 +14,15 @@ export function ConsentModal() {
   return (
     <Dialog open={true}>
       <DialogContent 
-        className="sm:max-w-[480px] p-0 overflow-hidden border-teal-100/50 shadow-2xl bg-white animate-fade-in-up"
+        className="max-h-[calc(100dvh-2rem)] overflow-hidden border-teal-100/50 bg-white p-0 shadow-2xl sm:max-w-[480px]"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {/* Top header with clinical gradient */}
-        <div className="bg-linear-to-r from-teal-700 to-emerald-600 px-6 py-6 text-white relative">
+        <div className="relative bg-linear-to-r from-teal-700 to-emerald-600 px-6 py-6 text-white">
           <div className="flex items-center gap-3">
-            <div className="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md">
-              <span className="text-3xl">🏥</span>
+            <div className="rounded-2xl bg-white/20 p-2.5 backdrop-blur-md">
+              <Stethoscope className="h-7 w-7" />
             </div>
             <div>
               <DialogTitle className="text-white text-xl font-bold tracking-tight">MediKid-AI</DialogTitle>
@@ -34,23 +34,24 @@ export function ConsentModal() {
         </div>
 
         {/* Modal body */}
-        <div className="px-6 py-5 space-y-4">
-          <div className="flex gap-2 text-amber-600 bg-amber-50 p-3 rounded-2xl border border-amber-100">
+        <div className="max-h-[calc(100dvh-11rem)] space-y-4 overflow-y-auto px-6 py-5">
+          <div className="flex gap-2 rounded-2xl border border-amber-100 bg-amber-50 p-3 text-amber-700">
             <ShieldAlert className="h-5 w-5 flex-shrink-0 mt-0.5 text-amber-500" />
             <div className="text-xs font-medium leading-relaxed">
               <strong>Nghị định 13/2023/NĐ-CP:</strong> Dữ liệu sức khỏe của con bạn được bảo vệ nghiêm ngặt. Vui lòng đọc kỹ và đồng thuận để bắt đầu tư vấn.
             </div>
           </div>
 
-          <DialogDescription className="text-gray-600 text-sm leading-relaxed">
+          <DialogDescription className="text-sm leading-relaxed text-slate-600">
             Chúng tôi cam kết bảo mật tuyệt đối dữ liệu y tế nhạy cảm của bé. Dữ liệu này chỉ được sử dụng cho mục đích phân tích triệu chứng lâm sàng sơ bộ và hỗ trợ bác sĩ tư vấn chuyên khoa.
           </DialogDescription>
 
           {/* Accordion detail */}
-          <div className="border border-teal-100/60 rounded-2xl overflow-hidden bg-teal-50/20">
+          <div className="overflow-hidden rounded-2xl border border-teal-100/60 bg-teal-50/20">
             <button
-              className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-teal-900 hover:bg-teal-50/50 transition-colors"
+              className="flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-teal-900 transition-colors hover:bg-teal-50/50"
               onClick={() => setShowDetail((v) => !v)}
+              aria-expanded={showDetail}
             >
               <span className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-teal-600" />
@@ -62,7 +63,7 @@ export function ConsentModal() {
             </button>
 
             {showDetail && (
-              <div className="px-4 pb-4 max-h-40 overflow-y-auto border-t border-teal-100/30 text-xs text-gray-600 space-y-3 pt-3">
+              <div className="max-h-40 space-y-3 overflow-y-auto border-t border-teal-100/30 px-4 pb-4 pt-3 text-xs text-slate-600">
                 <div>
                   <p className="font-bold text-teal-950">1. Mục đích xử lý dữ liệu</p>
                   <p className="mt-0.5 leading-relaxed">Hỗ trợ rà soát lịch sử dịch tễ, phân cấp mức độ lo âu của phụ huynh và nạp tri thức y tế RAG hỗ trợ phác đồ chẩn đoán lâm sàng của bác sĩ nhi khoa.</p>
@@ -80,7 +81,7 @@ export function ConsentModal() {
           </div>
 
           {/* Custom Checkbox */}
-          <label className="flex items-start gap-3 cursor-pointer group p-1 select-none">
+          <label htmlFor="consent-checkbox" className="group flex cursor-pointer select-none items-start gap-3 rounded-xl p-2">
             <div className="mt-0.5 relative">
               <input
                 type="checkbox"
@@ -89,13 +90,13 @@ export function ConsentModal() {
                 checked={checked}
                 onChange={(e) => setChecked(e.target.checked)}
               />
-              <div className="w-5 h-5 border-2 border-teal-200 rounded-lg bg-white peer-checked:bg-teal-600 peer-checked:border-teal-600 transition-all flex items-center justify-center group-hover:border-teal-400">
-                <svg className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg border-2 border-teal-200 bg-white transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-teal-600 peer-checked:border-teal-600 peer-checked:bg-teal-600 peer-checked:[&>svg]:opacity-100 group-hover:border-teal-400">
+                <svg className="h-3.5 w-3.5 text-white opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <span className="text-xs sm:text-sm text-gray-700 font-medium leading-relaxed group-hover:text-teal-900 transition-colors">
+            <span className="text-sm font-medium leading-relaxed text-slate-700 transition-colors group-hover:text-teal-900">
               Tôi xác nhận là người giám hộ hợp pháp và đồng ý cho phép xử lý dữ liệu sức khỏe của con theo Nghị định 13/2023/NĐ-CP.
             </span>
           </label>

@@ -46,6 +46,7 @@ docs/requirements.md            Yêu cầu sản phẩm
 docs/architecture.md            Kiến trúc hệ thống
 docs/ai-document-init-guide.md   Hướng dẫn init/cập nhật tài liệu cho AI
 docs/user-stories-acceptance-criteria.md  User Stories và Acceptance Criteria
+docs/plans/2026-05-21-mvp-ui-gap-agent-plan.md  UI gap & multi-agent plan
 docs/plans/                     Kế hoạch triển khai feature
 docs/decisions/                 Quyết định kỹ thuật/ADR
 scripts/             Script phát triển lặp lại
