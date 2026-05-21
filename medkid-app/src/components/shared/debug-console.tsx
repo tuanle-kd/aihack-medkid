@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAppStore } from '@/store/app-store';
-import { db } from '@/lib/mock-db';
+import { useAppStore, clearDebugLogs } from '@/store/app-store';
 import type { LogType } from '@/types';
 import { 
   Sheet, 
@@ -123,7 +122,7 @@ export function DebugConsole() {
           {/* Quick controls */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => { db.debug.clear(); refreshDebugLogs(); }}
+              onClick={() => { clearDebugLogs(); refreshDebugLogs(); }}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-rose-400 border border-gray-900 hover:border-rose-950 hover:bg-rose-950/20 rounded-xl transition-all cursor-pointer font-mono font-medium"
             >
               <Trash2 className="h-3.5 w-3.5" />

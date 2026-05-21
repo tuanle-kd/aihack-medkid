@@ -3,18 +3,28 @@
  * Mỗi stage log latency ra debug console.
  */
 
-import { db } from './mock-db';
 import { checkEmergency } from './emergency';
+import { pushDebugLog } from '@/store/app-store';
 import { MOCK_RAG_SNIPPETS, MOCK_AI_DRAFT, MOCK_EMR } from '@/mock/data';
-import type { MedCase, AnxietyLevel, WorkflowType } from '@/types';
+import type { MedCase, AnxietyLevel, WorkflowType, DebugLog } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function debugLog(type: DebugLog['type'], message: string, extra?: Partial<DebugLog>) {
+  pushDebugLog({
+    id: uuidv4(),
+    type,
+    message,
+    timestamp: new Date().toISOString(),
+    ...extra,
+  });
+}
+
 function logStage(stage: string, durationMs: number, status: 'ok' | 'error' = 'ok') {
-  db.debug.log('system', `[${stage}] ${status.toUpperCase()} — ${durationMs}ms`, {
+  debugLog('system', `[${stage}] ${status.toUpperCase()} — ${durationMs}ms`, {
     stage,
     duration_ms: durationMs,
   });
@@ -84,7 +94,7 @@ export async function runPipeline(
 ): Promise<PipelineResult> {
   const pipelineStart = Date.now();
 
-  db.debug.log('system', `[PIPELINE START] session=${sessionId} hasImage=${hasImage}`);
+  debugLog('system', `[PIPELINE START] session=${sessionId} hasImage=${hasImage}`);
 
   // Stage 1: Emergency check (synchronous, < 20ms)
   const t0 = Date.now();
@@ -92,8 +102,7 @@ export async function runPipeline(
   logStage('Emergency_Filter', Date.now() - t0);
 
   if (emergencyResult.triggered) {
-    db.debug.log('system', `[EMERGENCY BYPASS] keywords=${emergencyResult.matched.join(', ')}`);
-    db.audit.log('EMERGENCY_BYPASS', sessionId);
+    debugLog('system', `[EMERGENCY BYPASS] keywords=${emergencyResult.matched.join(', ')}`);
     return {
       isEmergency: true,
       emergencyKeywords: emergencyResult.matched,
@@ -115,7 +124,7 @@ export async function runPipeline(
   const anxietyLevel = detectAnxiety(rawText);
   const workflowType = detectWorkflow(normalizedText);
   logStage('NLP_Preprocess', Date.now() - t1);
-  db.debug.log('feedback', `[NLP] anxiety=${anxietyLevel} workflow=${workflowType}`);
+  debugLog('feedback', `[NLP] anxiety=${anxietyLevel} workflow=${workflowType}`);
 
   // Stage 3: RAG retrieve + EMR sync (parallel)
   const [ragResult, emrResult] = await Promise.all([
@@ -124,7 +133,7 @@ export async function runPipeline(
       await delay(200 + Math.random() * 100);
       const snippets = MOCK_RAG_SNIPPETS.filter((s) => s.similarity > 0.6);
       logStage('RAG_Retrieve', Date.now() - t);
-      db.debug.log('ml', `[RAG] top-${snippets.length} retrieved, max_sim=${snippets[0]?.similarity}`);
+      debugLog('ml', `[RAG] top-${snippets.length} retrieved, max_sim=${snippets[0]?.similarity}`);
       return snippets;
     })(),
     (async () => {
@@ -132,7 +141,7 @@ export async function runPipeline(
       await delay(150 + Math.random() * 100);
       const emr = vclinicId ? (MOCK_EMR[vclinicId] ?? null) : null;
       logStage('EMR_Sync', Date.now() - t, emr ? 'ok' : 'ok');
-      if (!emr) db.debug.log('system', '[VCLINIC] no EMR found, proceeding without');
+      if (!emr) debugLog('system', '[VCLINIC] no EMR found, proceeding without');
       return emr;
     })(),
   ]);
@@ -149,7 +158,7 @@ export async function runPipeline(
       morphology: workflowType === 'Skin_Lesion' ? 'papule' : 'unknown',
     };
     logStage('CV_Analyze', Date.now() - t);
-    db.debug.log('ml', `[CV] area=${cvAnalysis.area_cm2}cm² color=${cvAnalysis.dominant_color}`);
+    debugLog('ml', `[CV] area=${cvAnalysis.area_cm2}cm² color=${cvAnalysis.dominant_color}`);
   }
 
   // Stage 5: Fusion
@@ -158,17 +167,17 @@ export async function runPipeline(
   const wCv = workflowType === 'Skin_Lesion' ? 0.7 : workflowType === 'Respiratory' ? 0.3 : 0.2;
   const wNlp = 1 - wCv;
   logStage('Fusion', Date.now() - t4);
-  db.debug.log('tuning', `[FUSION] W_nlp=${wNlp} W_cv=${wCv} workflow=${workflowType}`);
+  debugLog('tuning', `[FUSION] W_nlp=${wNlp} W_cv=${wCv} workflow=${workflowType}`);
 
   // Stage 6: LLM draft
   const t5 = Date.now();
   await delay(1000 + Math.random() * 500);
   const aiDraft = MOCK_AI_DRAFT; // In production: call Claude API
   logStage('LLM_Draft', Date.now() - t5);
-  db.debug.log('system', `[LLM] draft generated, ${aiDraft.split(' ').length} words`);
+  debugLog('system', `[LLM] draft generated, ${aiDraft.split(' ').length} words`);
 
   const total = Date.now() - pipelineStart;
-  db.debug.log('system', `[PIPELINE DONE] total=${total}ms`);
+  debugLog('system', `[PIPELINE DONE] total=${total}ms`);
 
   return {
     isEmergency: false,
@@ -223,10 +232,6 @@ export function createNewCase(
     rag_snippets: result.ragSnippets,
     cv_analysis: result.cvAnalysis ?? undefined,
   };
-
-  db.cases.upsert(newCase);
-  db.audit.log('MESSAGE_SENT', sessionId, { case_id: caseId });
-  db.audit.log('DRAFT_GENERATED', sessionId, { case_id: caseId });
 
   return newCase;
 }

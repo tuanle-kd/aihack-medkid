@@ -9,7 +9,14 @@ import { FileText, ShieldAlert, ChevronDown, ChevronUp } from 'lucide-react';
 export function ConsentModal() {
   const [checked, setChecked] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [loading, setLoading] = useState(false);
   const grantConsent = useAppStore((s) => s.grantConsent);
+
+  const handleConsent = async () => {
+    setLoading(true);
+    await grantConsent().catch(console.error);
+    setLoading(false);
+  };
 
   return (
     <Dialog open={true}>
@@ -102,13 +109,13 @@ export function ConsentModal() {
 
           {/* CTA Button */}
           <Button
-            disabled={!checked}
-            onClick={grantConsent}
+            disabled={!checked || loading}
+            onClick={handleConsent}
             variant="default"
             size="lg"
             className="w-full text-base font-bold shadow-teal-700/20 shadow-lg"
           >
-            Đồng Ý & Bắt Đầu Tư Vấn
+            {loading ? 'Đang xử lý...' : 'Đồng Ý & Bắt Đầu Tư Vấn'}
           </Button>
         </div>
       </DialogContent>
