@@ -32,22 +32,24 @@ Có thể dùng script tương ứng:
 ```text
 src/                 Source code chính
 tests/               Test tự động khi bổ sung
-docs/requirements.md Yêu cầu sản phẩm
-docs/architecture.md Kiến trúc hệ thống
-docs/plans/          Kế hoạch triển khai feature
-docs/decisions/      Quyết định kỹ thuật/ADR
+docs/requirements.md            Yêu cầu sản phẩm
+docs/architecture.md            Kiến trúc hệ thống
+docs/ai-document-init-guide.md   Hướng dẫn init/cập nhật tài liệu cho AI
+docs/plans/                     Kế hoạch triển khai feature
+docs/decisions/                 Quyết định kỹ thuật/ADR
 scripts/             Script phát triển lặp lại
 config/              Config mẫu theo môi trường
 ```
 
 ## Development Workflow
 
-1. Cập nhật `docs/requirements.md` nếu thay đổi yêu cầu sản phẩm.
-2. Cập nhật `docs/architecture.md` nếu thay đổi kiến trúc.
-3. Viết plan vào `docs/plans/` cho feature lớn.
-4. Implement trong `src/`.
-5. Chạy `npm run lint` và `npm run build` trước khi hoàn tất.
-6. Ghi ADR vào `docs/decisions/` nếu có quyết định kỹ thuật quan trọng.
+1. Đọc `docs/ai-document-init-guide.md` nếu cần khởi tạo/cập nhật bộ tài liệu cho AI.
+2. Cập nhật `docs/requirements.md` nếu thay đổi yêu cầu sản phẩm.
+3. Cập nhật `docs/architecture.md` nếu thay đổi kiến trúc.
+4. Viết plan vào `docs/plans/` cho feature lớn.
+5. Implement trong `src/`.
+6. Chạy `npm run lint` và `npm run build` trước khi hoàn tất.
+7. Ghi ADR vào `docs/decisions/` nếu có quyết định kỹ thuật quan trọng.
 
 ## Notes
 
