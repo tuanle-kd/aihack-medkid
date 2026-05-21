@@ -1,5 +1,11 @@
 # MedKid Requirements
 
+Chi tiết User Stories và Acceptance Criteria có đánh số nằm tại:
+
+```text
+docs/user-stories-acceptance-criteria.md
+```
+
 ## Business Goals
 
 - Xây dựng ứng dụng MedKid hỗ trợ người dùng trong bối cảnh y tế/trẻ em.
