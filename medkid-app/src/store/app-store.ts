@@ -37,6 +37,7 @@ interface AppState {
   selectCase: (id: string | null) => void;
   approveCase: (caseId: string, finalDraft: string) => void;
   rejectCase: (caseId: string, reason: string) => void;
+  forwardCase: (caseId: string, toDoctorId: string, note: string) => void;
   toggleDebugConsole: () => void;
   refreshDebugLogs: () => void;
   resetEmergency: () => void;
@@ -194,6 +195,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { sessionId } = get();
     db.cases.reject(caseId, 'dr-001', reason);
     db.audit.log('REJECTED', sessionId ?? 'unknown', { case_id: caseId });
+    set({
+      cases: db.cases.list(),
+      selectedCaseId: null,
+      debugLogs: db.debug.list(),
+    });
+  },
+
+  forwardCase: (caseId, toDoctorId, note) => {
+    const { sessionId } = get();
+    db.cases.forward(caseId, toDoctorId, note);
+    db.audit.log('FORWARDED', sessionId ?? 'unknown', { case_id: caseId });
+    db.debug.log('system', `[FORWARDED] case=${caseId} to=${toDoctorId} note="${note}"`);
     set({
       cases: db.cases.list(),
       selectedCaseId: null,

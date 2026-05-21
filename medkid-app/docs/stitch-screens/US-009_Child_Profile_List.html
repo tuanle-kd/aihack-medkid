@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="vi" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#d3e4fe",
+                    "on-error": "#ffffff",
+                    "primary": "#00685f",
+                    "secondary": "#006c49",
+                    "on-surface-variant": "#3d4947",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "on-primary-fixed-variant": "#005049",
+                    "tertiary": "#0058be",
+                    "on-primary-container": "#f4fffc",
+                    "on-secondary-container": "#00714d",
+                    "secondary-container": "#6cf8bb",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary-fixed": "#d8e2ff",
+                    "surface-dim": "#cbdbf5",
+                    "primary-container": "#008378",
+                    "on-tertiary-container": "#fefcff",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary-fixed": "#00201d",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#bcc9c6",
+                    "inverse-surface": "#213145",
+                    "tertiary-container": "#2170e4",
+                    "surface": "#f8f9ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "inverse-primary": "#6bd8cb",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "primary-fixed": "#89f5e7",
+                    "primary-fixed-dim": "#6bd8cb",
+                    "outline": "#6d7a77",
+                    "on-surface": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#0b1c30",
+                    "surface-tint": "#006a61",
+                    "surface-container": "#e5eeff",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-secondary-fixed-variant": "#005236",
+                    "background": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xxl": "48px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "container-padding": "24px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "display-lg": ["Montserrat"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Montserrat"],
+                    "caption": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "title-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "caption": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .child-card-selected {
+            border-color: #00685f !important;
+            background-color: #f4fffc !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 104, 95, 0.1);
+        }
+        .vclinic-gradient {
+            background: linear-gradient(135deg, #00685f 0%, #008378 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar from JSON Guidance -->
+<header class="bg-surface shadow-sm docked full-width top-0 z-50 flex justify-between items-center w-full px-lg py-md">
+<div class="flex items-center gap-sm"><span class="font-display-lg text-headline-md font-bold text-primary" style="color: #0d9488;">US-009: Child Profile List</span></div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-base rounded-full">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-base rounded-full">account_circle</button>
+</div>
+</header>
+<main class="flex-grow container mx-auto px-container-padding py-xl max-w-4xl">
+<!-- Title & Intro -->
+<div class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">US-009: Child Profile List</h1>
+<p class="text-on-surface-variant font-body-md">Vui lòng chọn hồ sơ của bé để bắt đầu tư vấn hoặc thêm thành viên mới.</p>
+</div>
+<!-- Children Profiles Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xxl" id="profiles-container">
+<!-- Profile Card 1 -->
+<div class="group cursor-pointer bg-surface-container-lowest border border-outline-variant rounded-xl p-md transition-all hover:-translate-y-1 hover:shadow-md relative overflow-hidden" onclick="selectProfile(this)">
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-fixed" style="border-color: #0d9488;">
+<img alt="Child profile" class="w-full h-full object-cover" data-alt="A close-up, high-quality portrait of a joyful toddler with soft lighting in a modern, clinical yet warm environment. The aesthetic follows a professional medical photography style with soft teal and white tones in the background, conveying a sense of safety and professional pediatric care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmy9DpSSEW9zF_rzVARmZUhpzSVw9LUBJILSJsiXBo5aen59sqiZi8Mj8pdztBiH1NNEg1OTxnQbO6TvccsM_6YwuO5Ttiu5UwzZoGt6lXfuVpSKaMQrFB5yMSBWkNjoan9ZdpTDTabRp2a8H3zCS8dBkV6udeiaa6LZeFKixeMVSyZIDhHNgnxICpmtYQ7f2EFSZR7Gd0CDhagLOCOFliYd0mc3j6RFKXc7ELaQPKl3_Zf58jY9na75QAbajLtFhQWauTFXsghos">
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between">
+<h3 class="font-title-lg text-title-lg text-on-surface">Minh Anh</h3>
+<span class="material-symbols-outlined text-primary" style="color: #0d9488; font-variation-settings: 'FILL' 1;" title="VCLINIC Synced">link</span>
+</div>
+<p class="text-on-surface-variant font-body-sm">4 tuổi • Nữ</p>
+</div>
+</div>
+<div class="mt-md flex items-center gap-xs text-secondary font-label-md">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="">Hồ sơ đã xác thực</span>
+</div>
+</div>
+<!-- Profile Card 2 -->
+<div class="group cursor-pointer bg-surface-container-lowest border border-outline-variant rounded-xl p-md transition-all hover:-translate-y-1 hover:shadow-md relative overflow-hidden" onclick="selectProfile(this)">
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-outline-variant">
+<img alt="Child profile" class="w-full h-full object-cover" data-alt="A bright and airy photograph of a smiling young boy wearing a clean white shirt, set against a soft-focus background of a modern pediatric clinic. The color palette emphasizes clean teal and soft white tones, consistent with a high-end Corporate Modern healthcare identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFmr0RZzuYkLQQlgIFuFw9iEYke958YGMhwbi7A8_6HDSdBquVfq0G99WZ6-472FR7RhM1fOFgF5XSeUyNttyoBD0Bzkp7lCRdJvWVobYMgBYOh11OVbX16ZPExxHAjXy_-Bz4FKsP014SPsNcmKQLMrhylMcb_DxrgLukqekBz1M-RM0X6RjddegwTHl_Z-g_qjepC0zSGSgumCZtKXYvX2YOgg5TdGKFn7H4rlP-ug-XybDbKXfhQx-cUmLiTvwN5a69U7S5dJk">
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between">
+<h3 class="font-title-lg text-title-lg text-on-surface">Gia Bảo</h3>
+<span class="material-symbols-outlined text-outline" title="Not Synced">link_off</span>
+</div>
+<p class="text-on-surface-variant font-body-sm">2 tuổi • Nam</p>
+</div>
+</div>
+<div class="mt-md flex items-center gap-xs text-on-surface-variant font-label-md">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+<span class="">Chưa đồng bộ VCLINIC</span>
+</div>
+</div>
+<!-- Add Child Button Card -->
+<button class="flex flex-col items-center justify-center border-2 border-dashed border-outline-variant rounded-xl p-xl bg-surface-bright hover:bg-surface-container-low hover:border-primary transition-colors group">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-sm group-hover:scale-110 transition-transform" style="background-color: #0d9488; color: #ffffff;">
+<span class="material-symbols-outlined">add</span>
+</div>
+<span class="font-title-lg text-title-lg text-primary" style="color: #0d9488;">Thêm bé mới</span>
+<span class="font-label-md text-on-surface-variant mt-xs">Tối đa 5 hồ sơ</span>
+</button>
+</div>
+<!-- Sticky Action Bar -->
+<div class="fixed bottom-0 left-0 w-full p-lg md:p-xl bg-surface/80 backdrop-blur-md flex flex-col items-center gap-md lg:static lg:bg-transparent lg:p-0">
+<button class="w-full max-w-md py-md px-xl rounded-full text-on-primary font-title-lg shadow-lg opacity-50 cursor-not-allowed transition-all active:scale-95 disabled:hover:scale-100 flex items-center justify-center gap-sm" disabled="" id="start-btn" style="background-color: #0d9488; border-radius: 0.5rem;">
+<span class="material-symbols-outlined">medical_services</span>
+                Bắt đầu tư vấn
+            </button>
+<p class="text-caption text-on-surface-variant text-center max-w-sm">
+                Bằng cách tiếp tục, bạn đồng ý với các Điều khoản &amp; Điều kiện về tư vấn sức khỏe trẻ em của KinderHealth.
+            </p>
+</div>
+</main>
+<!-- BottomNavBar from JSON Guidance -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-16 bg-surface shadow-lg rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors flex-1 h-full">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md">Chat</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 flex-1 mx-2">
+<span class="material-symbols-outlined">medical_information</span>
+<span class="font-label-md text-label-md">Records</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors flex-1 h-full">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="font-label-md text-label-md">Triage</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors flex-1 h-full">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</div>
+</nav>
+<script>
+        function selectProfile(element) {
+            // Remove selection from others
+            const cards = document.querySelectorAll('#profiles-container > div');
+            cards.forEach(card => card.classList.remove('child-card-selected'));
+            
+            // Add selection to clicked
+            element.classList.add('child-card-selected');
+            
+            // Enable Button
+            const btn = document.getElementById('start-btn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.classList.add('hover:shadow-xl', 'hover:-translate-y-0.5');
+
+            // Feedback micro-interaction
+            element.style.transform = "scale(0.98)";
+            setTimeout(() => {
+                element.style.transform = "";
+            }, 150);
+        }
+    </script>
+</body></html>

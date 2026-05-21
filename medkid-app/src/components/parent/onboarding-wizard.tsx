@@ -71,6 +71,7 @@ function validatePassword(pw: string): string {
 export function OnboardingWizard() {
   const completeOnboarding = useAppStore((s) => s.completeOnboarding);
 
+  const [referenceTimeMs] = useState(() => Date.now());
   const [step, setStep] = useState<Step>(1);
   const [parent, setParent] = useState<ParentForm>(INIT_PARENT);
 
@@ -322,10 +323,11 @@ export function OnboardingWizard() {
 
           {step === 2 && (
             <Step2Form
-              children={children}
+              childEntries={children}
               currentChild={currentChild}
               editingIdx={editingIdx}
               vclinicStatus={vclinicStatus}
+              referenceTimeMs={referenceTimeMs}
               errors={errors}
               setCC={setCC}
               onVerifyVclinic={handleVerifyVclinic}
@@ -474,10 +476,11 @@ function OtpStep({
 // ─── Step 2 Form ───────────────────────────────────────────────────────────────
 
 function Step2Form({
-  children,
+  childEntries,
   currentChild,
   editingIdx,
   vclinicStatus,
+  referenceTimeMs,
   errors,
   setCC,
   onVerifyVclinic,
@@ -485,10 +488,11 @@ function Step2Form({
   onEditChild,
   onRemoveChild,
 }: {
-  children: ChildEntry[];
+  childEntries: ChildEntry[];
   currentChild: ChildEntry;
   editingIdx: number | null;
   vclinicStatus: 'idle' | 'verifying' | 'success' | 'fail';
+  referenceTimeMs: number;
   errors: Record<string, string>;
   setCC: (
     k: keyof ChildEntry
@@ -498,7 +502,7 @@ function Step2Form({
   onEditChild: (idx: number) => void;
   onRemoveChild: (idx: number) => void;
 }) {
-  const showForm = editingIdx !== null || children.length < MAX_CHILDREN;
+  const showForm = editingIdx !== null || childEntries.length < MAX_CHILDREN;
 
   return (
     <div className="space-y-4">
@@ -507,24 +511,24 @@ function Step2Form({
         <p className="text-xs font-bold text-slate-700">
           {editingIdx !== null
             ? 'Chỉnh sửa hồ sơ bé'
-            : children.length === 0
+            : childEntries.length === 0
             ? 'Thêm hồ sơ bé đầu tiên'
             : 'Thêm hồ sơ bé mới'}
         </p>
         <span
           className={cn(
             'rounded-full px-2 py-0.5 text-[10px] font-bold',
-            children.length >= MAX_CHILDREN
+            childEntries.length >= MAX_CHILDREN
               ? 'bg-amber-100 text-amber-700'
               : 'bg-teal-50 text-teal-700'
           )}
         >
-          {children.length}/{MAX_CHILDREN} hồ sơ
+          {childEntries.length}/{MAX_CHILDREN} hồ sơ
         </span>
       </div>
 
       {/* Max warning */}
-      {children.length >= MAX_CHILDREN && editingIdx === null && (
+      {childEntries.length >= MAX_CHILDREN && editingIdx === null && (
         <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-medium text-amber-700">
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           Đã đạt tối đa 5 hồ sơ bệnh nhi. Chỉnh sửa hoặc xóa hồ sơ hiện có để tiếp tục.
@@ -653,7 +657,7 @@ function Step2Form({
           </div>
 
           {/* Save child button — shown when there are already saved children or when editing */}
-          {(children.length > 0 || editingIdx !== null) && (
+          {(childEntries.length > 0 || editingIdx !== null) && (
             <Button
               type="button"
               variant="outline"
@@ -677,16 +681,17 @@ function Step2Form({
       )}
 
       {/* Saved children list */}
-      {children.length > 0 && (
+      {childEntries.length > 0 && (
         <div className="space-y-2">
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
-            Đã thêm ({children.length} bé)
+            Đã thêm ({childEntries.length} bé)
           </p>
-          {children.map((child, idx) => (
+          {childEntries.map((child, idx) => (
             <ChildRow
               key={child.id}
               child={child}
               isEditing={editingIdx === idx}
+              referenceTimeMs={referenceTimeMs}
               onEdit={() => onEditChild(idx)}
               onRemove={() => onRemoveChild(idx)}
             />
@@ -702,16 +707,18 @@ function Step2Form({
 function ChildRow({
   child,
   isEditing,
+  referenceTimeMs,
   onEdit,
   onRemove,
 }: {
   child: ChildEntry;
   isEditing: boolean;
+  referenceTimeMs: number;
   onEdit: () => void;
   onRemove: () => void;
 }) {
   const ageMonths = child.dob
-    ? Math.floor((Date.now() - new Date(child.dob).getTime()) / (1000 * 60 * 60 * 24 * 30))
+    ? Math.floor((referenceTimeMs - new Date(child.dob).getTime()) / (1000 * 60 * 60 * 24 * 30))
     : null;
 
   return (

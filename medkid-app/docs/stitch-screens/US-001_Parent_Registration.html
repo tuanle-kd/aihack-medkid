@@ -1,0 +1,275 @@
+<!DOCTYPE html><html class="light" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>US-001: Parent Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#0d9488",
+                    "primary-container": "#ccfbf1",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#042f2e",
+                    "secondary": "#006c49",
+                    "surface": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-surface": "#0b1c30",
+                    "on-surface-variant": "#3d4947",
+                    "outline": "#6d7a77",
+                    "outline-variant": "#bcc9c6",
+                    "background": "#f8f9ff",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xxl": "48px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "sans": ["Montserrat", "sans-serif"],
+                    "display": ["Montserrat", "sans-serif"],
+                    "body": ["Montserrat", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(13, 148, 136, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen overflow-x-hidden">
+<main class="min-h-screen flex items-center justify-center p-md lg:p-xxl">
+<div class="w-full max-w-5xl flex flex-col lg:row-reverse lg:flex-row glass-card rounded-xl overflow-hidden shadow-2xl">
+<!-- Left Panel: Brand & Visual -->
+<div class="lg:w-[40%] bg-primary p-lg lg:p-xl flex flex-col justify-between relative overflow-hidden text-on-primary">
+<div class="z-10">
+<div class="mb-lg">
+<img alt="KinderHealth Logo" class="h-12 w-auto mb-md brightness-0 invert" src="https://lh3.googleusercontent.com/aida/ADBb0ujP7CwiSRboaEZa0Acm7SvTPOgmXwD_4IROUVD4Un4EGfVceCWXp2l-TlvMcxUPitFPDdAXQvMY3txRkVofF01-TfaFJPPkgCJCMmNSI-Fy4wtgelk0CCL4xH-HUKNVgtOO5f7gaTJiis8Upp53HhFSnEhO2P9BAfsvj1yQDlwGgWCR9w166lCWDrrs4UYLeSuFofIoClSt434dXREjNr9KUpBl7utHZ18-whQIckZTN8XwsIs85hw4AXQ">
+<h1 class="text-3xl font-bold tracking-tight mb-xs">KinderHealth</h1>
+<p class="text-teal-50 opacity-90 text-sm leading-relaxed">Chăm sóc sức khỏe nhi khoa hiện đại, tin cậy và ấm áp.</p>
+</div>
+</div>
+<div class="z-10">
+<div class="flex items-start gap-md mb-lg bg-white/10 p-md rounded-lg backdrop-blur-sm">
+<span class="material-symbols-outlined mt-1">verified_user</span>
+<div>
+<h3 class="font-bold text-sm">An toàn &amp; Bảo mật</h3>
+<p class="text-xs opacity-80 mt-xs leading-relaxed">Dữ liệu được bảo vệ theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</p>
+</div>
+</div>
+<div class="relative rounded-lg overflow-hidden shadow-xl aspect-video">
+<img alt="Pediatrician and Child" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY3nRrTQ4prRwoqQUFdW7FNlX38UsKCnUvOsYvZFJugjvZiD3nZef3jvaIk6450lWVGWItd3gY-4Tom46_pqdRCubX0tXveuKfAF67JtxtqtKJQ7uwpKViD79LQ8T1WbPE5oZlHuUMmcNMvnGJGc4--Se4Yl9u12RseBVsRo4RIR9HOT_54fCkL5oHgfBs3Egb6s7DDzqSBF1dkD_1bOhyrbS5yPIwuF7sC5jtTN_emCS58Xku6Pw1nH6H_saa2mqLc02nEyoEfJg">
+</div>
+</div>
+<!-- Background Decorative Elements -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+<!-- Right Panel: Form Content -->
+<div class="lg:w-[60%] p-lg lg:p-xxl bg-white flex flex-col justify-center">
+<div class="w-full max-w-md mx-auto" id="registration-container">
+<!-- Step 1: Parent Info Form -->
+<div class="step-transition" id="step-info">
+<div class="mb-xl">
+<h2 class="text-2xl font-bold text-primary mb-xs">US-001: Parent Registration</h2>
+<p class="text-on-surface-variant text-sm">Vui lòng cung cấp thông tin để bắt đầu hành trình chăm sóc bé.</p>
+</div>
+<form class="space-y-lg" id="form-register">
+<!-- Full Name -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant" for="fullname">Họ và tên (Bắt buộc)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline text-xl">person</span>
+<input class="w-full pl-12 pr-md py-3 rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm bg-surface" id="fullname" placeholder="Nguyễn Văn A" required="" type="text">
+</div>
+</div>
+<!-- Phone Number -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant" for="phone">Số điện thoại (Bắt buộc)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline text-xl">call</span>
+<input class="w-full pl-12 pr-md py-3 rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm bg-surface" id="phone" pattern="^(0|84)(3|5|7|8|9)([0-9]{8})$" placeholder="0901234567" required="" type="tel">
+</div>
+<p class="text-[10px] text-outline mt-1 italic">Định dạng Việt Nam (10 số)</p>
+</div>
+<!-- Email -->
+<div class="flex flex-col gap-xs">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant" for="email">Email (Tùy chọn)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline text-xl">mail</span>
+<input class="w-full pl-12 pr-md py-3 rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm bg-surface" id="email" placeholder="example@email.com" type="email">
+</div>
+</div>
+<!-- Consent Checkbox -->
+<div class="flex items-start gap-md mt-xl p-md bg-surface-container-low rounded-lg border border-teal-100">
+<div class="flex items-center h-5">
+<input class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary cursor-pointer" id="terms" type="checkbox">
+</div>
+<label class="text-xs text-on-surface-variant cursor-pointer leading-relaxed" for="terms">
+                                Tôi đã đọc và đồng ý với <a class="text-primary font-bold hover:underline" href="#">Điều khoản sử dụng</a> và cam kết bảo vệ dữ liệu cá nhân theo <strong>Nghị định 13/2023/NĐ-CP</strong> của KinderHealth.
+                            </label>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full py-4 bg-primary text-on-primary font-bold text-base rounded-xl shadow-lg hover:bg-teal-700 disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition-all transform active:scale-[0.98] mt-lg" disabled="" id="btn-submit-info" type="button">
+                            Tiếp tục
+                        </button>
+</form>
+</div>
+<!-- Step 2: OTP Verification -->
+<div class="hidden step-transition opacity-0" id="step-otp">
+<div class="mb-xl text-center">
+<button class="flex items-center gap-xs text-primary font-bold text-xs mb-md hover:translate-x-[-4px] transition-transform mx-auto" id="btn-back" type="button">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span> Quay lại chỉnh sửa
+                        </button>
+<h2 class="text-2xl font-bold text-primary mb-xs">Xác thực OTP</h2>
+<p class="text-on-surface-variant text-sm">Mã xác thực đã được gửi đến số điện thoại <strong class="text-on-surface" id="display-phone"></strong>.</p>
+</div>
+<div class="flex flex-col gap-lg">
+<div class="flex justify-between gap-sm">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+<input class="otp-input w-full aspect-square text-center text-xl font-bold border-2 border-outline-variant rounded-lg focus:border-primary focus:ring-0 outline-none bg-surface transition-all" maxlength="1" type="text">
+</div>
+<div class="text-center">
+<p class="text-xs text-on-surface-variant mb-md">Không nhận được mã?</p>
+<button class="text-primary font-bold text-xs border border-primary px-lg py-sm rounded-full hover:bg-primary-container transition-all" type="button">
+                                Gửi lại mã (59s)
+                            </button>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary font-bold text-base rounded-xl shadow-lg hover:bg-teal-700 transition-all transform active:scale-[0.98] mt-xl" id="btn-verify-otp" type="button">
+                            Đăng ký ngay
+                        </button>
+</div>
+</div>
+<!-- Step 3: Success -->
+<div class="hidden step-transition opacity-0 text-center" id="step-success">
+<div class="w-20 h-20 bg-teal-100 text-primary rounded-full flex items-center justify-center mx-auto mb-xl shadow-inner">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="text-2xl font-bold text-primary mb-sm">Đăng ký thành công!</h2>
+<p class="text-on-surface-variant text-sm mb-xxl leading-relaxed px-4">Chào mừng phụ huynh đã đến với gia đình KinderHealth. Tài khoản của bạn đã sẵn sàng sử dụng.</p>
+<button class="w-full py-4 bg-primary text-on-primary font-bold text-base rounded-xl shadow-lg hover:bg-teal-700 transition-all transform active:scale-[0.98]" onclick="location.reload()" type="button">
+                        Bắt đầu khám phá ngay
+                    </button>
+</div>
+<!-- Footer Disclaimer -->
+<div class="mt-xl pt-lg border-t border-outline-variant/30">
+<p class="text-[10px] text-outline text-center leading-tight">
+                        Hệ thống KinderHealth - Bảo mật theo tiêu chuẩn quốc tế ISO/IEC 27001.<br>
+                        © 2024 KinderHealth. All rights reserved.
+                    </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+    const stepInfo = document.getElementById('step-info');
+    const stepOtp = document.getElementById('step-otp');
+    const stepSuccess = document.getElementById('step-success');
+    const termsCheckbox = document.getElementById('terms');
+    const btnSubmitInfo = document.getElementById('btn-submit-info');
+    const btnVerifyOtp = document.getElementById('btn-verify-otp');
+    const btnBack = document.getElementById('btn-back');
+    const phoneInput = document.getElementById('phone');
+    const displayPhone = document.getElementById('display-phone');
+    const otpInputs = document.querySelectorAll('.otp-input');
+
+    // Form Validation
+    const validateForm = () => {
+        const isNameValid = document.getElementById('fullname').value.trim() !== '';
+        const isPhoneValid = phoneInput.checkValidity();
+        const isTermsChecked = termsCheckbox.checked;
+        btnSubmitInfo.disabled = !(isNameValid && isPhoneValid && isTermsChecked);
+    };
+
+    ['fullname', 'phone'].forEach(id => {
+        document.getElementById(id).addEventListener('input', validateForm);
+    });
+    termsCheckbox.addEventListener('change', validateForm);
+
+    // Transitions
+    btnSubmitInfo.addEventListener('click', () => {
+        displayPhone.innerText = phoneInput.value;
+        
+        stepInfo.classList.add('opacity-0');
+        setTimeout(() => {
+            stepInfo.classList.add('hidden');
+            stepOtp.classList.remove('hidden');
+            setTimeout(() => {
+                stepOtp.classList.remove('opacity-0');
+                otpInputs[0].focus();
+            }, 50);
+        }, 400);
+    });
+
+    btnBack.addEventListener('click', () => {
+        stepOtp.classList.add('opacity-0');
+        setTimeout(() => {
+            stepOtp.classList.add('hidden');
+            stepInfo.classList.remove('hidden');
+            setTimeout(() => {
+                stepInfo.classList.remove('opacity-0');
+            }, 50);
+        }, 400);
+    });
+
+    btnVerifyOtp.addEventListener('click', () => {
+        stepOtp.classList.add('opacity-0');
+        setTimeout(() => {
+            stepOtp.classList.add('hidden');
+            stepSuccess.classList.remove('hidden');
+            setTimeout(() => {
+                stepSuccess.classList.remove('opacity-0');
+            }, 50);
+        }, 400);
+    });
+
+    // OTP Functionality
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (input.value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+</script>
+</body></html>

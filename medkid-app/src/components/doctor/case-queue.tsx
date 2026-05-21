@@ -6,7 +6,10 @@ import { formatRelativeTime, ageLabel } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { MedCase, AnxietyLevel } from '@/types';
-import { Clock, Image as ImageIcon, CheckCircle, Hourglass, Activity } from 'lucide-react';
+import { ArrowDownUp, Clock, Image as ImageIcon, CheckCircle, Hourglass, Activity } from 'lucide-react';
+
+type FilterType = 'all' | 'panic' | 'has_images' | 'overdue';
+type SortType = 'oldest' | 'newest' | 'panic_first';
 
 const ANXIETY_CONFIG: Record<AnxietyLevel, { label: string; badgeVariant: 'calm' | 'concerned' | 'panic' }> = {
   calm: { label: 'Bình tĩnh', badgeVariant: 'calm' },
@@ -24,6 +27,8 @@ export function CaseQueue() {
   const selectedCaseId = useAppStore((s) => s.selectedCaseId);
   const selectCase = useAppStore((s) => s.selectCase);
   const [now, setNow] = useState<number | null>(null);
+  const [filter, setFilter] = useState<FilterType>('all');
+  const [sort, setSort] = useState<SortType>('oldest');
 
   useEffect(() => {
     const initial = window.setTimeout(() => setNow(Date.now()), 0);
@@ -34,8 +39,27 @@ export function CaseQueue() {
     };
   }, []);
 
-  const pendingCases = cases.filter((c) => c.status === 'pending');
+  const allPending = cases.filter((c) => c.status === 'pending');
   const approvedCases = cases.filter((c) => c.status !== 'pending');
+
+  const filteredCases = allPending.filter((c) => {
+    if (filter === 'panic') return c.anxiety_level === 'panic';
+    if (filter === 'has_images') return c.has_images;
+    if (filter === 'overdue') {
+      if (!now) return false;
+      return Math.floor((now - new Date(c.created_at).getTime()) / 60000) > 30;
+    }
+    return true;
+  });
+
+  const pendingCases = [...filteredCases].sort((a, b) => {
+    if (sort === 'newest') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    if (sort === 'panic_first') {
+      const order = { panic: 0, concerned: 1, calm: 2 };
+      return order[a.anxiety_level] - order[b.anxiety_level];
+    }
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+  });
 
   return (
     <div className="flex h-full flex-col border-r border-slate-200 bg-slate-50/30">
@@ -47,7 +71,7 @@ export function CaseQueue() {
             <h2 className="truncate text-sm font-bold tracking-tight text-slate-800">Hàng đợi duyệt lâm sàng</h2>
           </div>
           <span className="shrink-0 rounded-full bg-teal-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-xs">
-            {pendingCases.length} Chờ Duyệt
+            {allPending.length} Chờ Duyệt
           </span>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
@@ -55,6 +79,52 @@ export function CaseQueue() {
           <QueueStat label="Panic" value={String(cases.filter((c) => c.anxiety_level === 'panic' && c.status === 'pending').length)} />
           <QueueStat label="Ảnh" value={String(cases.filter((c) => c.has_images && c.status === 'pending').length)} />
         </div>
+
+        {/* Filter chips */}
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {(['all', 'panic', 'has_images', 'overdue'] as FilterType[]).map((f) => {
+            const labels: Record<FilterType, string> = { all: 'Tất cả', panic: 'Panic', has_images: 'Có ảnh', overdue: 'Chờ > 30p' };
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  'rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide transition-colors',
+                  filter === f
+                    ? 'bg-teal-700 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                )}
+              >
+                {labels[f]}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sort row */}
+        <div className="mt-2 flex items-center gap-2">
+          <ArrowDownUp className="h-3 w-3 shrink-0 text-slate-400" />
+          <div className="flex flex-wrap gap-1">
+            {([['oldest', 'Chờ lâu nhất'], ['newest', 'Mới nhất'], ['panic_first', 'Panic trước']] as [SortType, string][]).map(([s, label]) => (
+              <button
+                key={s}
+                onClick={() => setSort(s)}
+                className={cn(
+                  'rounded-md px-2 py-0.5 text-[10px] font-bold transition-colors',
+                  sort === s ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {filter !== 'all' && (
+          <p className="mt-2 text-[10px] font-bold text-slate-500">
+            Hiển thị {pendingCases.length}/{allPending.length} ca
+          </p>
+        )}
       </div>
 
       {/* Queue list */}

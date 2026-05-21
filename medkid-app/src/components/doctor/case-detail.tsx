@@ -24,10 +24,40 @@ import {
   CheckCircle,
   AlertTriangle,
   BookOpen,
-  Camera
+  Camera,
+  ArrowUpRight,
+  Clock,
+  MessageCircleQuestion,
+  Plus,
+  ChevronRight,
 } from 'lucide-react';
 import { TipTapEditor } from '@/components/ui/tiptap-editor';
 import { CVImageOverlay } from '@/components/doctor/cv-image-overlay';
+import { MOCK_DOCTORS } from '@/mock/data';
+import type { WorkflowType } from '@/types';
+
+const FOLLOW_UP_SUGGESTIONS: Record<WorkflowType, string[]> = {
+  Skin_Lesion: [
+    'Bé có sốt kèm theo không?',
+    'Phát ban xuất hiện sau khi ăn gì hoặc tiếp xúc gì?',
+    'Trước đây bé đã từng bị phát ban tương tự chưa?',
+  ],
+  Respiratory: [
+    'Bé bắt đầu có triệu chứng từ bao giờ?',
+    'Nhịp thở của bé có nhanh hơn bình thường không?',
+    'Có ai trong nhà đang bị cúm hay ho không?',
+  ],
+  IgG_Food_Sensitivity: [
+    'Bé có ăn gì mới trong 24 giờ qua không?',
+    'Triệu chứng xuất hiện sau khi ăn bao lâu?',
+    'Bé có tiêu chảy hoặc nôn kèm theo không?',
+  ],
+  General: [
+    'Triệu chứng bắt đầu từ bao giờ và diễn biến ra sao?',
+    'Bé có bỏ ăn hoặc bú kém không?',
+    'Bé có sốt không và nhiệt độ đo được là bao nhiêu?',
+  ],
+};
 
 export function CaseDetail() {
   const selectedCaseId = useAppStore((s) => s.selectedCaseId);
@@ -35,12 +65,16 @@ export function CaseDetail() {
   const selectCase = useAppStore((s) => s.selectCase);
   const approveCase = useAppStore((s) => s.approveCase);
   const rejectCase = useAppStore((s) => s.rejectCase);
+  const forwardCase = useAppStore((s) => s.forwardCase);
 
   const medCase = cases.find((c) => c.id === selectedCaseId);
   const [draftState, setDraftState] = useState({ caseId: '', value: '' });
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showDiffState, setShowDiffState] = useState({ caseId: '', value: false });
+  const [showForwardModal, setShowForwardModal] = useState(false);
+  const [forwardDoctorId, setForwardDoctorId] = useState('');
+  const [forwardNote, setForwardNote] = useState('');
 
   if (!medCase) {
     return (
@@ -143,7 +177,15 @@ export function CaseDetail() {
             className="flex-1 border-red-200 font-bold text-red-600 hover:border-red-300 hover:bg-red-50"
           >
             <X className="h-4 w-4 mr-1.5 text-red-500" />
-            Từ chối duyệt ca
+            Từ chối
+          </Button>
+          <Button
+            onClick={() => { setForwardDoctorId(''); setForwardNote(''); setShowForwardModal(true); }}
+            variant="outline"
+            className="flex-1 border-slate-200 font-bold text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+          >
+            <ArrowUpRight className="h-4 w-4 mr-1.5 text-slate-500" />
+            Chuyển BS
           </Button>
           <Button
             onClick={() => approveCase(medCase.id, draft)}
@@ -151,8 +193,63 @@ export function CaseDetail() {
             className="flex-[2] bg-emerald-600 font-black tracking-wide text-white shadow-lg shadow-emerald-700/10 hover:bg-emerald-700"
           >
             <Check className="h-4 w-4 mr-1.5 text-white" />
-            Ký duyệt & gửi phụ huynh
+            Ký duyệt & gửi
           </Button>
+        </div>
+      )}
+
+      {/* Forward modal overlay */}
+      {showForwardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl">
+            <div className="flex items-center gap-2 mb-3 text-slate-700">
+              <ArrowUpRight className="h-5 w-5 text-slate-500" />
+              <h4 className="font-bold text-slate-800 text-sm sm:text-base">Chuyển ca cho bác sĩ khác</h4>
+            </div>
+            <p className="text-xs text-slate-500 leading-relaxed mb-4">
+              Ca sẽ xuất hiện trong hàng đợi của bác sĩ được chọn kèm theo ghi chú của bạn.
+            </p>
+
+            <label className="mb-1 block text-xs font-bold text-slate-600">Chọn bác sĩ đang online</label>
+            <select
+              className="mb-4 min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base font-medium transition-all focus:outline-hidden focus:ring-2 focus:ring-teal-600 sm:text-sm"
+              onChange={(e) => setForwardDoctorId(e.target.value)}
+              defaultValue=""
+            >
+              <option value="" disabled>Chọn bác sĩ</option>
+              {MOCK_DOCTORS.filter((d) => d.online).map((d) => (
+                <option key={d.id} value={d.id}>{d.name} — {d.specialty}</option>
+              ))}
+            </select>
+
+            <label className="mb-1 block text-xs font-bold text-slate-600">Ghi chú chuyển ca</label>
+            <textarea
+              value={forwardNote}
+              onChange={(e) => setForwardNote(e.target.value)}
+              placeholder="Lý do chuyển ca, điểm cần lưu ý..."
+              className="mb-4 min-h-16 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium transition-all focus:outline-hidden focus:ring-2 focus:ring-teal-600"
+              rows={3}
+            />
+
+            <div className="flex gap-2">
+              <Button onClick={() => setShowForwardModal(false)} variant="outline" className="flex-1 text-xs">
+                Hủy
+              </Button>
+              <Button
+                onClick={() => {
+                  if (forwardDoctorId) {
+                    forwardCase(medCase.id, forwardDoctorId, forwardNote);
+                    setShowForwardModal(false);
+                  }
+                }}
+                disabled={!forwardDoctorId}
+                className="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold"
+              >
+                <ArrowUpRight className="h-3.5 w-3.5 mr-1" />
+                Xác nhận chuyển
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -226,10 +323,12 @@ function DraftTabContent({
   setShowDiff: (v: boolean) => void;
   onReset: () => void;
 }) {
+  const [dismissedSuggestions, setDismissedSuggestions] = useState(false);
   const original = medCase.ai_draft ?? '';
   const wordCount = draft.split(/\s+/).filter(Boolean).length;
   const originalCount = original.split(/\s+/).filter(Boolean).length;
   const diff = wordCount - originalCount;
+  const suggestions = FOLLOW_UP_SUGGESTIONS[medCase.workflow_type] ?? [];
 
   return (
     <div className="space-y-4">
@@ -332,6 +431,36 @@ function DraftTabContent({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+      )}
+      {/* Follow-up question suggestions */}
+      {!dismissedSuggestions && suggestions.length > 0 && medCase.status === 'pending' && (
+        <div className="rounded-2xl border border-teal-100 bg-teal-50/30 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-800">
+              <MessageCircleQuestion className="h-4 w-4 text-teal-600" />
+              Câu hỏi gợi ý ({suggestions.length})
+            </h4>
+            <button
+              onClick={() => setDismissedSuggestions(true)}
+              className="text-[10px] font-bold text-slate-400 hover:text-slate-600 underline"
+            >
+              Ẩn tất cả
+            </button>
+          </div>
+          <div className="space-y-2">
+            {suggestions.map((q, i) => (
+              <button
+                key={i}
+                onClick={() => setDraft(draft + '\n\n' + q)}
+                className="flex w-full items-center gap-2 rounded-xl border border-teal-100 bg-white px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition-colors hover:border-teal-300 hover:bg-teal-50"
+              >
+                <Plus className="h-3.5 w-3.5 shrink-0 text-teal-600" />
+                {q}
+                <ChevronRight className="ml-auto h-3 w-3 shrink-0 text-slate-300" />
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -512,6 +641,8 @@ function PatientTabContent({ medCase }: { medCase: MedCase }) {
 // ─── Input Messages Tab Content Component ─────────────────────────────────────
 
 function MessagesTabContent({ medCase }: { medCase: MedCase }) {
+  const showTimeline = medCase.messages.length >= 2;
+
   return (
     <div className="space-y-4">
       {medCase.messages.map((msg) => (
@@ -536,6 +667,40 @@ function MessagesTabContent({ medCase }: { medCase: MedCase }) {
       {/* CV bounding box overlay — shown when case has images + CV data */}
       {medCase.has_images && medCase.cv_analysis && (
         <CVImageOverlay cv={medCase.cv_analysis} />
+      )}
+
+      {/* Symptom timeline — shown when >= 2 turns */}
+      {showTimeline && (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/30 p-4">
+          <h4 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+            <Clock className="h-4 w-4 text-teal-600" />
+            Diễn tiến triệu chứng
+          </h4>
+          <div className="relative ml-2 space-y-0">
+            {[...medCase.messages].reverse().map((msg, i, arr) => (
+              <div key={msg.id} className="relative flex gap-3 pb-4">
+                {/* vertical line */}
+                {i < arr.length - 1 && (
+                  <div className="absolute left-[7px] top-5 h-full w-px bg-slate-200" />
+                )}
+                <div className="relative z-10 mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-teal-500 bg-white">
+                  <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold text-slate-400">{formatTime(msg.timestamp)}</p>
+                  <p className="mt-0.5 text-xs font-semibold leading-relaxed text-slate-700 line-clamp-2">
+                    {msg.content}
+                  </p>
+                  {msg.images && msg.images.length > 0 && (
+                    <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-bold text-teal-700">
+                      <Camera className="h-2.5 w-2.5" /> Có ảnh
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
