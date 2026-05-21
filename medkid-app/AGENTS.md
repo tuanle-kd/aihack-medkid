@@ -12,6 +12,7 @@ MedKid là ứng dụng Next.js phục vụ bài toán y tế/trẻ em trong khu
 
 ## Quy tắc làm việc
 
+- Đọc `docs/ai-document-init-guide.md` khi cần khởi tạo/cập nhật bộ tài liệu cho AI.
 - Đọc `docs/requirements.md` trước khi thay đổi hành vi sản phẩm.
 - Đọc `docs/architecture.md` trước khi thay đổi kiến trúc, routing, data flow hoặc tích hợp bên ngoài.
 - Với feature lớn, tạo plan trong `docs/plans/YYYY-MM-DD-feature-name.md` trước khi code.
@@ -34,10 +35,11 @@ MedKid là ứng dụng Next.js phục vụ bài toán y tế/trẻ em trong khu
 ```text
 src/                 Source code chính
 tests/               Test tự động nếu/ khi được bổ sung
-docs/requirements.md Yêu cầu sản phẩm
-docs/architecture.md Kiến trúc hệ thống
-docs/plans/          Kế hoạch triển khai theo feature
-docs/decisions/      Architecture Decision Records
+docs/requirements.md            Yêu cầu sản phẩm
+docs/architecture.md            Kiến trúc hệ thống
+docs/ai-document-init-guide.md   Hướng dẫn init/cập nhật tài liệu cho AI
+docs/plans/                     Kế hoạch triển khai theo feature
+docs/decisions/                 Architecture Decision Records
 scripts/             Script phát triển/lint/build
 config/              Config mẫu theo môi trường
 ```
